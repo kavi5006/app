@@ -6,7 +6,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import OneHotEncoder
 
 # Load the heart disease dataset
-df = pd.read_csv('/content/heart.csv')
+df = pd.read_csv('heart.csv')
 
 # Define features and target variable
 # Use the provided column names
