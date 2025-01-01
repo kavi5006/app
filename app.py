@@ -1,4 +1,3 @@
-!pip install scikit-learn
 import streamlit as st
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -8,16 +7,16 @@ from sklearn.preprocessing import OneHotEncoder
 
 # Load the heart disease dataset
 df = pd.read_csv('/content/heart.csv')
+
 # Define features and target variable
-# Use the provided column names
 X = df[['Age', 'Sex', 'ChestPainType', 'RestingBP', 'Cholesterol', 'FastingBS', 'RestingECG', 'MaxHR', 'ExerciseAngina', 'Oldpeak']]
-y = df['HeartDisease']  # Assuming 'target' is your target variable column
+y = df['HeartDisease']
 
 # Create a OneHotEncoder object
 encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore')
 
 # Fit the encoder to your categorical features and transform them
-categorical_features = ['Sex', 'ChestPainType', 'FastingBS', 'RestingECG', 'ExerciseAngina']  # List your categorical columns
+categorical_features = ['Sex', 'ChestPainType', 'FastingBS', 'RestingECG', 'ExerciseAngina']
 encoded_features = encoder.fit_transform(X[categorical_features])
 
 # Create a DataFrame from the encoded features
@@ -59,26 +58,33 @@ def main():
     # Prepare input data for prediction
     user_input = pd.DataFrame({
         'Age': [age],
-        'Sex': 1 if sex == "Male" else 0,  # Assuming 1 for Male, 0 for Female
+        'Sex': 1 if sex == "Male" else 0,
         'ChestPainType': [cp],
         'RestingBP': [trestbps],
         'Cholesterol': [chol],
-        'FastingBS': 1 if fbs == "Yes" else 0,  # Assuming 1 for Yes, 0 for No
+        'FastingBS': 1 if fbs == "Yes" else 0,
         'RestingECG': [restecg],
         'MaxHR': [thalach],
-        'ExerciseAngina': 1 if exang == "Yes" else 0,  # Assuming 1 for Yes, 0 for No
+        'ExerciseAngina': 1 if exang == "Yes" else 0,
         'Oldpeak': [oldpeak]
-    })# Ensure categorical features in user_input are strings
-    for feature in categorical_features:
-      user_input[feature] = user_input[feature].astype(str)
+    }, index=[0])  # Add an index to the DataFrame
 
-# Apply one-hot encoding to user input
+    # Ensure categorical features in user_input are strings
+    user_input['Sex'] = user_input['Sex'].astype(str)
+    user_input['ChestPainType'] = user_input['ChestPainType'].astype(str)
+    user_input['FastingBS'] = user_input['FastingBS'].astype(str)
+    user_input['RestingECG'] = user_input['RestingECG'].astype(str)
+    user_input['ExerciseAngina'] = user_input['ExerciseAngina'].astype(str)
+
+    # Apply one-hot encoding to user input
     encoded_user_input = encoder.transform(user_input[categorical_features])
     encoded_user_input_df = pd.DataFrame(encoded_user_input, columns=encoder.get_feature_names_out(categorical_features))
 
-# Drop original categorical features and concatenate encoded features
-    user_input = user_input.drop(categorical_features, axis=1)
+    # Concatenate encoded features
     user_input = pd.concat([user_input, encoded_user_input_df], axis=1)
+
+    # Drop original categorical features
+    user_input = user_input.drop(categorical_features, axis=1)
 
     # Make prediction
     prediction = model.predict(user_input)[0]
@@ -94,5 +100,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-# ... (rest of your Streamlit code from def main():) ...
